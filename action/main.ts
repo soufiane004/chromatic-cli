@@ -66,12 +66,7 @@ async function runChromatic(options): Promise<Output> {
   const sessionId = uuid();
   const env = getEnv();
   const log = createLogger(sessionId, env);
-  const packagePath = await pkgUp({
-    cwd: path.join(process.cwd(), options.workingDir || '')
-  }); // the user's own package.json
-  log.log('options.workingDir:', options.workingDir);
-  log.log('JOINED workingDir:', path.join(process.cwd(), options.workingDir || ''));
-  log.log('FOUND package.json dir:', packagePath);
+  const packagePath = await pkgUp(); // the user's own package.json
   const packageJson = await readFile(packagePath);
 
   const ctx = {
@@ -124,6 +119,7 @@ async function run() {
 
     process.env.CHROMATIC_SHA = sha;
     process.env.CHROMATIC_BRANCH = branch;
+    process.chdir(path.join(process.cwd(), workingDir || ''));
 
     const chromatic = runChromatic({
       projectToken,

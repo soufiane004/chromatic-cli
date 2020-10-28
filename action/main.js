@@ -115,14 +115,9 @@ function runChromatic(options) {
                     sessionId = uuid_1.v4();
                     env = getEnv_1["default"]();
                     log = log_1.createLogger(sessionId, env);
-                    return [4 /*yield*/, pkg_up_1["default"]({
-                            cwd: path_1["default"].join(process.cwd(), options.workingDir || '')
-                        })];
+                    return [4 /*yield*/, pkg_up_1["default"]()];
                 case 1:
                     packagePath = _b.sent();
-                    log.log('options.workingDir:', options.workingDir);
-                    log.log('JOINED workingDir:', path_1["default"].join(process.cwd(), options.workingDir || ''));
-                    log.log('FOUND package.json dir:', packagePath);
                     return [4 /*yield*/, jsonfile_1.readFile(packagePath)];
                 case 2:
                     packageJson = _b.sent();
@@ -178,6 +173,7 @@ function run() {
                     ignoreLastBuildOnBranch = core_1.getInput('ignoreLastBuildOnBranch');
                     process.env.CHROMATIC_SHA = sha;
                     process.env.CHROMATIC_BRANCH = branch;
+                    process.chdir(path_1["default"].join(process.cwd(), workingDir || ''));
                     chromatic = runChromatic({
                         projectToken: projectToken,
                         workingDir: maybe(workingDir),
