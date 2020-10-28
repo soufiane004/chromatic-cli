@@ -55,6 +55,7 @@ var github_1 = require("@actions/github");
 var jsonfile_1 = require("jsonfile");
 var pkg_up_1 = __importDefault(require("pkg-up"));
 var uuid_1 = require("uuid");
+var path_1 = __importDefault(require("path"));
 var getEnv_1 = __importDefault(require("../bin/lib/getEnv"));
 var log_1 = require("../bin/lib/log");
 var parseArgs_1 = __importDefault(require("../bin/lib/parseArgs"));
@@ -114,9 +115,14 @@ function runChromatic(options) {
                     sessionId = uuid_1.v4();
                     env = getEnv_1["default"]();
                     log = log_1.createLogger(sessionId, env);
-                    return [4 /*yield*/, pkg_up_1["default"]()];
+                    return [4 /*yield*/, pkg_up_1["default"]({
+                            cwd: path_1["default"].join(process.cwd(), options.workingDir || '')
+                        })];
                 case 1:
                     packagePath = _b.sent();
+                    log.log('options.workingDir:', options.workingDir);
+                    log.log('JOINED workingDir:', path_1["default"].join(process.cwd(), options.workingDir || ''));
+                    log.log('FOUND package.json dir:', packagePath);
                     return [4 /*yield*/, jsonfile_1.readFile(packagePath)];
                 case 2:
                     packageJson = _b.sent();
@@ -138,7 +144,7 @@ function runChromatic(options) {
 }
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var commit, branch, sha, projectToken, buildScriptName, scriptName, exec, skip, doNotStart, storybookPort, storybookUrl, storybookBuildDir, storybookHttps, storybookCert, storybookKey, storybookCa, preserveMissing, autoAcceptChanges, allowConsoleErrors, exitZeroOnChanges, exitOnceUploaded, ignoreLastBuildOnBranch, chromatic, _a, url, code, e_1;
+        var commit, branch, sha, projectToken, workingDir, buildScriptName, scriptName, exec, skip, doNotStart, storybookPort, storybookUrl, storybookBuildDir, storybookHttps, storybookCert, storybookKey, storybookCa, preserveMissing, autoAcceptChanges, allowConsoleErrors, exitZeroOnChanges, exitOnceUploaded, ignoreLastBuildOnBranch, chromatic, _a, url, code, e_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -151,6 +157,7 @@ function run() {
                 case 1:
                     _b.trys.push([1, 3, , 4]);
                     projectToken = core_1.getInput('projectToken') || core_1.getInput('appCode');
+                    workingDir = core_1.getInput('workingDir');
                     buildScriptName = core_1.getInput('buildScriptName');
                     scriptName = core_1.getInput('scriptName');
                     exec = core_1.getInput('exec');
@@ -173,6 +180,7 @@ function run() {
                     process.env.CHROMATIC_BRANCH = branch;
                     chromatic = runChromatic({
                         projectToken: projectToken,
+                        workingDir: maybe(workingDir),
                         buildScriptName: maybe(buildScriptName),
                         scriptName: maybe(scriptName),
                         exec: maybe(exec),

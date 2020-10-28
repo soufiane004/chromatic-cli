@@ -3,6 +3,7 @@ import { context } from '@actions/github';
 import { readFile } from 'jsonfile';
 import pkgUp from 'pkg-up';
 import { v4 as uuid } from 'uuid';
+import path from 'path';
 
 import getEnv from '../bin/lib/getEnv';
 import { createLogger } from '../bin/lib/log';
@@ -65,7 +66,12 @@ async function runChromatic(options): Promise<Output> {
   const sessionId = uuid();
   const env = getEnv();
   const log = createLogger(sessionId, env);
-  const packagePath = await pkgUp(); // the user's own package.json
+  const packagePath = await pkgUp({
+    cwd: path.join(process.cwd(), options.workingDir || '')
+  }); // the user's own package.json
+  log.log('options.workingDir:', options.workingDir);
+  log.log('JOINED workingDir:', path.join(process.cwd(), options.workingDir || ''));
+  log.log('FOUND package.json dir:', packagePath);
   const packageJson = await readFile(packagePath);
 
   const ctx = {
@@ -96,6 +102,7 @@ async function run() {
 
   try {
     const projectToken = getInput('projectToken') || getInput('appCode'); // backwards compatibility
+    const workingDir = getInput('workingDir');
     const buildScriptName = getInput('buildScriptName');
     const scriptName = getInput('scriptName');
     const exec = getInput('exec');
@@ -120,6 +127,7 @@ async function run() {
 
     const chromatic = runChromatic({
       projectToken,
+      workingDir: maybe(workingDir),
       buildScriptName: maybe(buildScriptName),
       scriptName: maybe(scriptName),
       exec: maybe(exec),
