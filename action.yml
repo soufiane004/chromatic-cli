@@ -48,5 +48,5 @@ inputs:
     description: "Exit with 0 once the built version has been sent to chromatic: boolean or branchname"
 
 runs: 
-  main: action/register.js
+  main: action/main.js
   using: node12
